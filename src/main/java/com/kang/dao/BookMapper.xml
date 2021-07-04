@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace
+命名空间，用于绑定一个对应的DAO/Mapper接口,这里和UserMapper绑定。
+这样相当于写了一个实现类来实现此接口。
+-->
+<mapper namespace="com.kang.dao.BookMapper">
+
+    <insert id="addBook" parameterType="Books">
+        insert into books(bookName, bookCounts, detail)
+        values (#{bookName},#{bookCounts},#{detail})
+    </insert>
+
+    <delete id="deleteBookById" parameterType="int">
+        delete from books where bookID=#{bookID}
+    </delete>
+
+    <update id="updateBook" parameterType="Books">
+        update books set bookName=#{bookName},bookCounts=#{bookCounts},detail=#{detail}
+        where bookID=#{bookID}
+    </update>
+
+    <select id="queryBookById" parameterType="int" resultType="Books">
+        select bookID,bookName,bookCounts,detail from books where bookID = #{bookID}
+    </select>
+
+    <select id="queryAllBooks" resultType="Books">
+        select bookID,bookName,bookCounts,detail from books;
+    </select>
+
+    <select id="queryBookByName" parameterType="String" resultType="Books">
+        select bookID,bookName,bookCounts,detail from books where bookName like concat('%',#{bookName},'%')
+    </select>
+    
+</mapper>

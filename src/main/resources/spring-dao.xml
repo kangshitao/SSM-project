@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <!-- 此文件用于整合spring和mybatis，在spring中配置数据源
+
+    这里我们选用第三方数据库连接池，而不是使用Spring 的原生的DriverManagerDataSource
+    -->
+
+    <!-- 1.关联数据库配置文件 -->
+
+    <!-- property-placeholder
+    用一个properties文件里的内容来替换spring配置文件里使用${}的变量定义，
+    比如有时候我们需要把对数据库的配置信息在别的properties文件里。
+    -->
+    <context:property-placeholder location="classpath:database.properties"/>
+
+    <!-- 2.连接池
+     dbcp:
+     c3p0:
+     druid
+     hikari:
+
+    这里使用druid数据库连接池
+    -->
+    <bean id = "dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <!-- 根据不同的数据库连接池，还可以设置其他的属性，比如关闭自动提交功能 -->
+        <property name="defaultAutoCommit" value="false"/>
+    </bean>
+
+    <!-- 3.获取SqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+    </bean>
+
+    <!-- 4.获取SqlSession -->
+    <!--
+    a.mybatis-spring的方式，需要一个BookMapper接口的实现类
+    使用SqlSessionTemplate或者继承SqlSessionDaoSupport类
+    b.这里使用另一种方式,即 MapperScannerConfigurer
+     -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- MapperScannerConfigurer基于反射动态生成实现类
+         sqlSessionFactoryBeanName为String类型，传入的值应该是一个字符串，因此用value。
+         ref用于传入引用类型的值。
+         -->
+
+        <!-- 设置要扫描的包 -->
+        <property name="basePackage" value="com.kang.dao"/>
+        <!-- 注入sqlSessionFactory -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+</beans>
